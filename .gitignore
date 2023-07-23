@@ -1,0 +1,12 @@
+# Compiled output
+/M1/node_modules
+/M2/node_modules
+
+# OS
+.DS_Store
+
+# IDEs and editors
+/.idea
+
+#Enviroments
+.env
