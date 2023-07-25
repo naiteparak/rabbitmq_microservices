@@ -34,8 +34,6 @@ services:
     extends:
       file: ./M2/docker-compose.yml
       service: m2
-    ports:
-      - ${M2_PORT}:${M2_PORT}
     networks:
       - custom_network
 
