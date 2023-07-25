@@ -1,16 +1,46 @@
 services:
   rabbitmq:
-    image: rabbitmq:3.12-management
+    image: rabbitmq:management
     container_name: rabbitmq
+    networks:
+      - custom_network
     environment:
       - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASS}
     ports:
-      - 5672:5672
-      - 15672:15672
+      - ${RABBITMQ_PORT}:${RABBITMQ_PORT}
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      interval: 5s
+      timeout: 2s
+      retries: 3
     restart: always
+  m1:
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    extends:
+      file: ./M1/docker-compose.yml
+      service: m1
+    ports:
+      - ${M1_PORT}:${M1_PORT}
+    networks:
+      - custom_network
+  m2:
+    depends_on:
+      - m1
+    extends:
+      file: ./M2/docker-compose.yml
+      service: m2
+    ports:
+      - ${M2_PORT}:${M2_PORT}
+    networks:
+      - custom_network
 
+networks:
+  custom_network:
+    driver: bridge
 volumes:
   rabbitmq_data:

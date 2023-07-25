@@ -1,0 +1,7 @@
+services:
+  m2:
+    container_name: M2
+    build:
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
