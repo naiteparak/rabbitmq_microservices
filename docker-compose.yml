@@ -21,21 +21,21 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
+    networks:
+      - custom_network
     extends:
       file: ./M1/docker-compose.yml
       service: m1
     ports:
       - ${M1_PORT}:${M1_PORT}
-    networks:
-      - custom_network
   m2:
     depends_on:
       - m1
+    networks:
+      - custom_network
     extends:
       file: ./M2/docker-compose.yml
       service: m2
-    networks:
-      - custom_network
 
 networks:
   custom_network:

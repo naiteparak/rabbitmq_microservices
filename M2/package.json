@@ -2,7 +2,7 @@
   "name": "m2",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/rpc.server.ts",
   "scripts": {
     "start": "nodemon"
   },
