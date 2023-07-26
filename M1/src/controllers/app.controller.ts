@@ -10,6 +10,14 @@ class AppController {
       .status(STATUS_CODES.OK)
       .send({ response: `Sum of numbers is ${sumNumbers}` });
   }
+
+  async fibonacci(req: Request, res: Response): Promise<Response> {
+    const number = req.body.number;
+    const fibonacci = await appService.fibonacci(number);
+    return res
+      .status(STATUS_CODES.OK)
+      .send({ response: `Fibonacci of ${number} is ${fibonacci}` });
+  }
 }
 
 export const appController = new AppController();

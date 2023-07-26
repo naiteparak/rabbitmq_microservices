@@ -1,5 +1,5 @@
 import { connect } from 'amqplib';
-import { generateUuid } from '../helpers/generate.uuid';
+import { randomUUID } from 'crypto';
 import 'dotenv/config';
 
 class AppService {
@@ -12,7 +12,7 @@ class AppService {
     const connection = await connect(this.connectionString);
     const channel = await connection.createChannel();
     const replyQueue = await channel.assertQueue('', { exclusive: true });
-    const correlationId = generateUuid();
+    const correlationId = randomUUID();
 
     console.log(` [x] Requesting for sum of numbers: ${numbers}`);
 
@@ -29,6 +29,36 @@ class AppService {
           if (msg?.properties.correlationId === correlationId) {
             const sum = parseInt(msg.content.toString(), 10);
             console.log(` [.] Got sum: ${sum}`);
+            connection.close();
+            resolve(sum);
+          }
+        },
+        { noAck: true },
+      );
+    });
+  }
+
+  async fibonacci(number: number) {
+    const connection = await connect(this.connectionString);
+    const channel = await connection.createChannel();
+    const replyQueue = await channel.assertQueue('', { exclusive: true });
+    const correlationId = randomUUID();
+
+    console.log(` [x] Requesting for fibonacci of number: ${number}`);
+
+    channel.sendToQueue(this.queue, Buffer.from(JSON.stringify(number)), {
+      correlationId: correlationId,
+      replyTo: replyQueue.queue,
+      type: 'fib',
+    });
+
+    return new Promise((resolve): void => {
+      channel.consume(
+        replyQueue.queue,
+        (msg): void => {
+          if (msg?.properties.correlationId === correlationId) {
+            const sum = parseInt(msg.content.toString(), 10);
+            console.log(` [.] Got fibonacci: ${sum}`);
             connection.close();
             resolve(sum);
           }
