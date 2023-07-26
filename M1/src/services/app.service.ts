@@ -1,6 +1,7 @@
 import { connect } from 'amqplib';
 import { randomUUID } from 'crypto';
 import 'dotenv/config';
+import { logger } from '../logger/logger';
 
 class AppService {
   private connectionString =
@@ -14,7 +15,7 @@ class AppService {
     const replyQueue = await channel.assertQueue('', { exclusive: true });
     const correlationId = randomUUID();
 
-    console.log(` [x] Requesting for sum of numbers: ${numbers}`);
+    logger.log('info', `[x] Requesting for sum of numbers: ${numbers}`);
 
     channel.sendToQueue(this.queue, Buffer.from(JSON.stringify(numbers)), {
       correlationId: correlationId,
@@ -28,7 +29,7 @@ class AppService {
         (msg): void => {
           if (msg?.properties.correlationId === correlationId) {
             const sum = parseInt(msg.content.toString(), 10);
-            console.log(` [.] Got sum: ${sum}`);
+            logger.log('info', `[.] Got sum: ${sum}`);
             connection.close();
             resolve(sum);
           }
@@ -44,7 +45,7 @@ class AppService {
     const replyQueue = await channel.assertQueue('', { exclusive: true });
     const correlationId = randomUUID();
 
-    console.log(` [x] Requesting for fibonacci of number: ${number}`);
+    logger.log('info', `[x] Requesting for fibonacci of number: ${number}`);
 
     channel.sendToQueue(this.queue, Buffer.from(JSON.stringify(number)), {
       correlationId: correlationId,
@@ -58,7 +59,8 @@ class AppService {
         (msg): void => {
           if (msg?.properties.correlationId === correlationId) {
             const sum = parseInt(msg.content.toString(), 10);
-            console.log(` [.] Got fibonacci: ${sum}`);
+            logger.log('info', `[.] Got fibonacci: ${sum}`);
+
             connection.close();
             resolve(sum);
           }

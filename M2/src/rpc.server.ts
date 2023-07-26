@@ -1,6 +1,7 @@
 import amqp from 'amqplib';
 import 'dotenv/config';
 import { taskDistributor } from './helpers/task.distributor';
+import { logger } from './logger/logger';
 
 const main = async function (): Promise<void> {
   try {
@@ -16,7 +17,9 @@ const main = async function (): Promise<void> {
 
     await channel.consume(QUEUE_NAME, (msg): void => {
       if (msg) {
+        logger.log('info', 'Got new message:', msg.content.toString());
         const result = taskDistributor(msg);
+        logger.log('info', 'Fibonacci is:', result);
         channel.sendToQueue(
           msg?.properties.replyTo,
           Buffer.from(result.toString()),
@@ -26,7 +29,7 @@ const main = async function (): Promise<void> {
       }
     });
   } catch (error) {
-    console.error('Error:', error);
+    logger.log('error', error);
   }
 };
 
