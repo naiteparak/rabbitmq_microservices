@@ -8,7 +8,6 @@ const main = async function (): Promise<void> {
     const connectionString =
       `amqp://${process.env.RABBITMQ_USER}:${process.env.RABBITMQ_PASS}@` +
       `${process.env.RABBITMQ_HOST}:${process.env.RABBITMQ_PORT}`;
-    console.log(connectionString);
     const connection = await amqp.connect(connectionString);
     const channel = await connection.createChannel();
     const QUEUE_NAME = 'rpc_queue';
