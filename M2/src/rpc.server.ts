@@ -16,9 +16,14 @@ const main = async function (): Promise<void> {
 
     await channel.consume(QUEUE_NAME, (msg): void => {
       if (msg) {
-        logger.log('info', 'Got new message:', msg.content.toString());
+        logger.log(
+          'info',
+          `Got new message: ${msg.content.toString()}, with type ${
+            msg.properties.type
+          }`,
+        );
         const result = taskDistributor(msg);
-        logger.log('info', 'Fibonacci is:', result);
+        logger.log('info', `Fibonacci is: ${result}`);
         channel.sendToQueue(
           msg?.properties.replyTo,
           Buffer.from(result.toString()),
